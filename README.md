@@ -1,4 +1,4 @@
-# vsvg-parser ( virtual SVG parser )  [![Build Status](https://travis-ci.org/jcblw/vsvg.svg?branch=master)](https://travis-ci.org/jcblw/vsvg)
+# vsvg-parser ( virtual SVG parser )  [![Build Status](https://travis-ci.org/jcblw/vsvg-parser.svg?branch=master)](https://travis-ci.org/jcblw/vsvg-parser)
 
 vsvg-parser is a small lib that allow you to parser svg's server side or client side. Its still in early devlopment so expect bug and file issues. Primarly used in [vsvg]( https://github.com/jcblw/vsvg ).
 
