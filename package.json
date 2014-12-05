@@ -1,0 +1,31 @@
+{
+  "name": "vsvg-parser",
+  "version": "0.0.1",
+  "description": "A minimal implementation of a svg parser used in vsvg",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run lint && faucet",
+    "lint": "jshint ./index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/jcblw/vsvg-parser"
+  },
+  "keywords": [
+    "svg",
+    "server",
+    "parser"
+  ],
+  "author": "Jacob Lowe",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jcblw/vsvg-parser/issues"
+  },
+  "homepage": "https://github.com/jcblw/vsvg-parser",
+  "devDependencies": {
+    "browserify": "^6.3.2",
+    "faucet": "0.0.1",
+    "jshint": "^2.5.10",
+    "tape": "^3.0.3"
+  }
+}
