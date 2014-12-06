@@ -2,7 +2,7 @@
 
 var startTag = /^<([-A-Za-z0-9_]+)(.*?)(\/?)>/g, // match opening tag
     endTag = /<\/([-A-Za-z0-9_]+)[^>]*>/, // this just matches the first one
-    attr = /([-A-Za-z0-9_]+)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/g; // match tag attributes
+    attr = /([-A-Za-z0-9_:]+)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/g; // match tag attributes
 
 exports.parse = parse;
 
