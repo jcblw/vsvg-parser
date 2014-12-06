@@ -73,12 +73,13 @@ test( 'testing parser::createTree', function( t ) {
 } );
 
 test( 'testing parser::parse', function( t ) {
-    var svg = '<svg><line foo="bar"></line><polygon /><g><line /></g></svg>',
+    var svg = '<svg foo:bar="baz" ><line foo="bar"></line><polygon /><g><line /></g></svg>',
         tree = parser.parse( svg );
 
     // test out some of the properties of new element
     t.equals( Array.isArray( tree ), true, 'an array is returned' )
     t.equals( tree[ 0 ].tagName, 'svg', 'the root tag is correct' );
+    t.equals( tree[ 0 ].attributes['foo:bar'], 'baz', 'the root tag\'s attributes foo:baz is parsed correctly' );
     t.equals( tree[ 0 ].children[ 0 ].tagName, 'line', 'the nested tag is correct' );
     t.equals( tree[ 0 ].children[ 0 ].attributes.foo, 'bar', 'the nested tag attributes are correct' );
     t.equals( tree[ 0 ].children[ 1 ].tagName, 'polygon', 'the nested self closing tag is correct' );
