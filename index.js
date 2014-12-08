@@ -135,7 +135,7 @@ function parse( xml ) {
     xml = xml.replace( /(\r\n|\n|\r)/gm, '' ); // remove all line breaks
 
     var tags = [],
-        position = [ 0 ], // initial position
+        position = [ -1 ], // initial position
         openTag, 
         attributes,
         end,
@@ -202,7 +202,10 @@ function parse( xml ) {
                 position[ tags[ tag.inside ].position.length ] += 1;
                 position = position.slice( 0, tags[ tag.inside ].position.length + 1 );
                 // eg. [ 0, 0, 1 ] this is a map of where this tag should be at
+            } else {
+                position[ 0 ] += 1;
             }
+
 
             tag.position = makeArray( position );
             tags.push( tag ); // push the tag
