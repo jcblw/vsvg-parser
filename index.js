@@ -2,35 +2,37 @@
 
 var startTag = /^<([-A-Za-z0-9_:]+)(.*?)(\/?)>/g, // match opening tag
     endTag = /<\/([-A-Za-z0-9_:]+)[^>]*>/, // this just matches the first one
+    docTag = /^<(\?)(.*?)(\/?)>/g, // this is like a doc tag of a proper svg,
+    commentTag = /^<(\!--)(.*?)(\/?)>/g,
     attr = /([-A-Za-z0-9_:]+)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/g; // match tag attributes
 
 exports.parse = parse;
 
-function makeArray( arr ) {
-    return Array.prototype.slice.call( arr, 0 );
+function makeArray(arr) {
+    return Array.prototype.slice.call(arr, 0);
 }
 
 /*
     getAttributes - turns an array of attributes into a key value object
     params
-        attributes { Array } - array of strings eg. [ 'x="5"' ]
+        attributes { Array } - array of strings eg. ['x="5"']
     returns
         attributes { Object } - object of key values eg. { x: '5' }
 */
 
 var getAttributes =
-exports.getAttributes = function getAttributes( attributes ) {
+exports.getAttributes = function getAttributes(attributes) {
     var _attributes = {};
 
-    function addToAttributes( keyvalue ) {
-        var arr = keyvalue.split( /=/ ),
-            key = arr[ 0 ],
-            value = arr[ 1 ] ? arr[ 1 ].slice( 1 ).slice( 0, -1 ) : '';
+    function addToAttributes(keyvalue) {
+        var arr = keyvalue.split(/=/),
+            key = arr[0],
+            value = arr[1] ? arr[1].slice(1).slice(0, -1) : '';
 
-        _attributes[ key ] = value;
+        _attributes[key] = value;
     }
 
-    attributes.forEach( addToAttributes );
+    attributes.forEach(addToAttributes);
 
     return _attributes;
 };
@@ -45,9 +47,9 @@ exports.getAttributes = function getAttributes( attributes ) {
 */
 
 var getTagIndex =
-exports.getTagIndex = function getTagIndex( tagName, tags ) {
-    for ( var i = tags.length - 1; i >= 0; i -= 1 ) {
-        if ( tags[i].tagName === tagName ) {
+exports.getTagIndex = function getTagIndex(tagName, tags) {
+    for (var i = tags.length - 1; i >= 0; i -= 1) {
+        if (tags[i].tagName === tagName) {
             return i;
         }
     }
@@ -64,12 +66,12 @@ exports.getTagIndex = function getTagIndex( tagName, tags ) {
 */
 
 var getLastOpenTag =
-exports.getLastOpenTag = function getLastOpenTag( tags ) {
-   for ( var i = tags.length - 1; i >= 0; i -= 1 ) {
-        if ( !tags[ i ].closed ) {
+exports.getLastOpenTag = function getLastOpenTag(tags) {
+   for (var i = tags.length - 1; i >= 0; i -= 1) {
+        if (!tags[i].closed) {
             return i;
         }
-   } 
+   }
    return -1;
 };
 
@@ -82,26 +84,26 @@ exports.getLastOpenTag = function getLastOpenTag( tags ) {
 */
 
 var createTree =
-exports.createTree = function createTree( tags ) {
+exports.createTree = function createTree(tags) {
 
     var _tags = [];
 
-    function getArray( position, arr ) {
-        var _position = makeArray( position );
-        if ( _position.length === 1 ) {
+    function getArray(position, arr) {
+        var _position = makeArray(position);
+        if (_position.length === 1) {
             return arr;
         }
-        var next = arr[ _position[ 0 ] ].children;
+        var next = arr[_position[0]].children;
         _position.shift();
-        return getArray( _position, next );
+        return getArray(_position, next);
     }
 
-    function addTagToTree( tag ) {
-        var arr = getArray( tag.position, _tags );
-        arr.push( tag );
+    function addTagToTree(tag) {
+        var arr = getArray(tag.position, _tags);
+        arr.push(tag);
     }
 
-    tags.forEach( addTagToTree );
+    tags.forEach(addTagToTree);
     return _tags;
 
 };
@@ -114,29 +116,29 @@ exports.createTree = function createTree( tags ) {
         xml { String } - a xml string eg. '<svg><line /></svg>'
     returns
         index { Array } - array of tags in a tree form same as the structure as the xml string
-        
+
         eg.
             [{
                 tagName: 'svg',
                 attributes: {},
-                position: [ 0 ]
+                position: [0]
                 children: [{
                     tagName: 'line',
                     attributes: {},
                     children: [],
-                    postion: [ 0, 0 ]
+                    postion: [0, 0]
                 }]
             }]
 
 */
 
-function parse( xml ) {
+function parse(xml) {
 
-    xml = xml.replace( /(\r\n|\n|\r)/gm, '' ); // remove all line breaks
+    xml = xml.replace(/(\r\n|\n|\r)/gm, ''); // remove all line breaks
 
     var tags = [],
-        position = [ -1 ], // initial position
-        openTag, 
+        position = [-1], // initial position
+        openTag,
         attributes,
         end,
         text,
@@ -145,78 +147,82 @@ function parse( xml ) {
         prevLength,
         closed,
         tagName,
-        tag;
+        tag,
+        specialTag;
 
-    while ( xml ) { // we carve away at the xml variable
+    while (xml) { // we carve away at the xml variable
 
-        // this checks to see if the previous string length is same as 
+        // this checks to see if the previous string length is same as
         // the current string length
-        if ( xml.length === prevLength ) {
-            throw new Error( 'Failed to parse SVG at chars: ' + xml.substring( 0, 5 ) );
+        if (xml.length === prevLength) {
+            throw new Error('Failed to parse SVG at chars: ' + xml.substring(0, 5));
         }
         // set prevLength
         prevLength = xml.length;
 
         xml = xml.trim(); // there is some issues with open tag if this is not done
 
-        openTag = xml.match( startTag );
+        openTag = xml.match(startTag);
+        specialTag = xml.match(docTag) || xml.match(commentTag);
 
-        if ( openTag ) { // if there is an open tag grab the attribute, and remove tag from xml string
-            openTag = openTag[ 0 ];
-            attributes = openTag.match( attr );
-            xml = xml.substring( openTag.length ); 
+        if (openTag) { // if there is an open tag grab the attribute, and remove tag from xml string
+            openTag = openTag[0];
+            attributes = openTag.match(attr);
+            xml = xml.substring(openTag.length);
             // reseting some vars
             text = null;
             prevTag = null;
             closed = null;
-            if ( /\/>$/.test( openTag ) ) { // testing for self closing tags
+            if (/\/>$/.test(openTag)) { // testing for self closing tags
                 closed = true;
             }
-        }
-        else {
-            end = xml.match( endTag ); // see if there is an end tag
+        } else if (specialTag) {
+            xml = xml.substring(specialTag[0].length);
             attributes = [];
-            if ( end ) { // if there is a end tag find the last tag with same name, set text, and remove data from xml string
-                index = getTagIndex( end[ 1 ], tags ); 
-                prevTag = tags[ index ];
-                text = xml.slice( 0, end.index );
-                xml = xml.substring( end.index + end[ 0 ].length );
+        } else {
+            end = xml.match(endTag); // see if there is an end tag
+            attributes = [];
+            if (end) { // if there is a end tag find the last tag with same name, set text, and remove data from xml string
+                index = getTagIndex(end[1], tags);
+                prevTag = tags[index];
+                text = xml.slice(0, end.index);
+                xml = xml.substring(end.index + end[0].length);
             }
         }
 
         tagName = attributes.shift(); // tagName with be the first in array
 
-        if ( tagName || text ) { // tagName or text will be set if it is somewhat of a good output
+        if (tagName || text) { // tagName or text will be set if it is somewhat of a good output
 
             tag = {
                 tagName: tagName,
-                attributes: getAttributes( attributes ), // convert to object
+                attributes: getAttributes(attributes), // convert to object
                 children: [],
                 text: text,
-                inside: getLastOpenTag( tags ), // this is needed to get an accurate position
+                inside: getLastOpenTag(tags), // this is needed to get an accurate position
                 closed: closed || !!text
             };
 
-            if ( tag.inside > -1 ) {
-                position.push( -1 ); // push this value it is sometime just cut off
-                position[ tags[ tag.inside ].position.length ] += 1;
-                position = position.slice( 0, tags[ tag.inside ].position.length + 1 );
-                // eg. [ 0, 0, 1 ] this is a map of where this tag should be at
+            if (tag.inside > -1) {
+                position.push(-1); // push this value it is sometime just cut off
+                position[tags[tag.inside].position.length] += 1;
+                position = position.slice(0, tags[tag.inside].position.length + 1);
+                // eg. [0, 0, 1] this is a map of where this tag should be at
             } else {
-                position[ 0 ] += 1;
+                position[0] += 1;
             }
 
 
-            tag.position = makeArray( position );
-            tags.push( tag ); // push the tag
+            tag.position = makeArray(position);
+            tags.push(tag); // push the tag
 
         }
 
-        if ( prevTag ) {
+        if (prevTag) {
             prevTag.closed = true; // close the prevTag
         }
 
     }
 
-    return createTree( tags ); // convert flat array to tree
+    return createTree(tags); // convert flat array to tree
 }
