@@ -1,5 +1,7 @@
 # vsvg-parser ( virtual SVG parser )  [![Build Status](https://travis-ci.org/jcblw/vsvg-parser.svg?branch=master)](https://travis-ci.org/jcblw/vsvg-parser)
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/jcblw/vsvg-parser.svg)](https://greenkeeper.io/)
+
 vsvg-parser is a small lib that allow you to parser svg's server side or client side. Its still in early devlopment so expect bug and file issues. Primarly used in [vsvg]( https://github.com/jcblw/vsvg ).
 
 ## Install
